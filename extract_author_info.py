@@ -9,7 +9,6 @@ should happen from.
 
 import pandas as pd
 import os
-import sys
 import difflib
 from collections import defaultdict
 import requests
@@ -203,7 +202,7 @@ class AuthorInfoExtraction:
             r_json = r.json()
         print('Upload complete\n')
 
-        # Now add datda to the deposition
+        # Now add meta data to the deposition
         data = {
             'metadata': {
                 'title': self.meta_title,
@@ -215,7 +214,8 @@ class AuthorInfoExtraction:
                 'communities' : [{'identifier': 'tarapacific'}],
                 'version' : '1',
                 'language': 'eng',
-                'creators': self.creator_array
+                'creators': self.creator_array,
+                'notes': self._get_notes()
             }
         }
         print('Meta information is:')
