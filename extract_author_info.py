@@ -97,6 +97,14 @@ class AuthorInfoExtraction:
         # personal access token is required for making uploads and publishing on Zenodo using their API
         with open(self.args.access_token_path, 'r') as f:
             self.access_token = f.readline().rstrip()
+        if self.args.references:
+            if not os.path.exists(self.args.references):
+                raise FileNotFoundError(f'{self.args.references} not found')
+            else:
+                with open(self.args.references, 'r') as f:
+                    self.references = [line.rstrip() for line in f]
+        else:
+            self.references = []
 
     def _define_args(self):
         self.parser.add_argument(
@@ -141,6 +149,10 @@ class AuthorInfoExtraction:
                  'If a path to a plain text file is given, the contents of that file will be used as the description.',
             required=False
         )
+        self.parser.add_argument(
+            '--references',
+            help='The full path to a file that contains the reference to be included in the metadata. '
+                 'Each reference should be placed on a sinlge line.', required=False)
 
     def _make_creator_array(self):
         """
@@ -215,7 +227,8 @@ class AuthorInfoExtraction:
                 'version' : '1',
                 'language': 'eng',
                 'creators': self.creator_array,
-                'notes': self._get_notes()
+                'notes': self._get_notes(),
+                'references': self.references
             }
         }
         print('Meta information is:')
@@ -473,27 +486,6 @@ class AuthorInfoExtraction:
                "Etienne Bourgois, and the Tara Ocean Foundation teams. Tara Pacific would not exist without the " \
                "continuous support of the participating institutes. The authors also particularly thank Serge " \
                "Planes, Denis Allemand, and the Tara Pacific consortium."
-
-# https://members.orcid.org/api/basic-tutorial-reading-data-orcid-record-30
-# Play with orcid
-
-# This was the code used to get the access token used below. According to the doc, it is good for 20 years.
-# headers = {"Accept": "application/json"}
-# data = {
-#     "client_id":[read_from_file],
-#     "client_secret":[read_from_file],
-#     "grant_type":"client_credentials",
-#     "scope":"/read-public"
-# }
-# url = "https://orcid.org/oauth/token"
-# # r = requests.post(url, data=data, headers=headers)
-# with open('/Users/humebc/Google_Drive/projects/tara/its2_for_zenodo/hume_orcid_access_token.txt', 'r') as f:
-#     access_token = [line.rstrip() for line in f][0]
-# headers = {"Accept":"application/json", "Authorization type":"Bearer", "Access token":access_token}
-# url = "https://pub.orcid.org/v3.0/0000-0003-4555-3795/record"
-# r = requests.get(url, headers=headers)
-# foo = 'bar'
-
 
 aie = AuthorInfoExtraction(fixes=False)
 aie.output_author_info()

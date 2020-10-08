@@ -1,0 +1,9 @@
+name: tara_zenodo_upload_env 
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3
+  - pandas
+  - requests  
+  - xlrd
